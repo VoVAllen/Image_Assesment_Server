@@ -1,23 +1,59 @@
-import torch
-import torch.nn as nn
-from torch.autograd import Variable
+"""
+@debounce(3)
+def hi(name):
+    print('hi {}'.format(name))
+hi('dude')
+time.sleep(1)
+hi('mike')
+time.sleep(1)
+hi('mary')
+time.sleep(1)
+hi('jane')
+"""
+import time
+import asyncio
 
 
-class EMDLoss(nn.Module):
-    def __init__(self):
-        super(EMDLoss, self).__init__()
+def debounce(s):
+    """Decorator ensures function that can only be called once every `s` seconds.
+    """
 
-    def forward(self, p_target: Variable, p_estimate: Variable):
-        assert p_target.shape == p_estimate.shape
-        # cdf for values [1, 2, ..., 10]
-        cdf_target = torch.cumsum(p_target, dim=1)
-        # cdf for values [1, 2, ..., 10]
-        cdf_estimate = torch.cumsum(p_estimate, dim=1)
-        cdf_diff = cdf_estimate - cdf_target
-        samplewise_emd = torch.sqrt(torch.mean(torch.pow(torch.abs(cdf_diff), 2)))
-        return samplewise_emd.mean()
+    def decorate(f):
+        t = None
+        arg_list = []
 
-emd_loss=EMDLoss()
+        def wrapped(*args, **kwargs):
+            nonlocal t
+            nonlocal arg_list
+            arg_list.append(*args)
+            print(arg_list)
+            t_ = time.time()
+            if t is None or t_ - t >= s:
+                result = f(arg_list, **kwargs)
+                arg_list = []
+                t = time.time()
+                return result
 
-a=torch.randn(128,10)
-b=torch.randn(128,10)
+        return wrapped
+
+    return decorate
+
+
+@debounce(3)
+def hi(name):
+    dict = {
+        'dude': 1,
+        'mike': 2,
+        'mary': 3,
+        'jane': 4
+    }
+    print('hi {}'.format(name))
+
+
+hi('dude')
+time.sleep(1)
+hi('mike')
+time.sleep(1)
+hi('mary')
+time.sleep(1)
+hi('jane')

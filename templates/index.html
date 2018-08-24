@@ -1,0 +1,554 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>图像美学评价</title>
+		<meta charset="utf-8">
+		<link href="/static/css/bootstrap.css" rel='stylesheet' type='text/css' />
+		<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+		<script src="/static/js/jquery.min.js"></script>
+		 <!-- Custom Theme files -->
+		<link href="/static/css/style.css" rel='stylesheet' type='text/css' />
+   		 <!-- Custom Theme files -->
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<script type="application/x-javascript"> addEventListener("load", function() { setTimeout(hideURLbar, 0); }, false); function hideURLbar(){ window.scrollTo(0,1); } </script>
+		<!---- animated-css ---->
+		<link href="/static/css/animate.css" rel="stylesheet" type="text/css" media="all">
+		<script type="text/javascript" src="/static/js/jquery.corner.js"></script>
+		<script src="/static/js/wow.min.js"></script>
+		
+		<link rel="stylesheet" href="/static/css/bootstrap.min.css">
+		<link rel="stylesheet" href="/static/css/animate.min.css">
+		<link rel="stylesheet" href="/static/css/font-awesome.min.css">
+		<link rel="stylesheet" href="/static/css/owl.theme.css">
+		<link rel="stylesheet" href="/static/css/owl.carousel.css">
+		<link rel="stylesheet" href="/static/css/style.css">
+		
+		<!-- bootstrap -->
+		<link rel="stylesheet" href="/static/assets/bootstrap/css/bootstrap.min.css" />
+
+		<!-- animate.css -->
+		<link rel="stylesheet" href="/static/assets/animate/animate.css" />
+		<link rel="stylesheet" href="/static/assets/animate/set.css" />
+
+		<!-- gallery -->
+		<link rel="stylesheet" href="/static/assets/gallery/blueimp-gallery.min.css">
+
+		<!-- favicon -->
+		<link rel="shortcut icon" href="/static/images/favicon.ico" type="image/x-icon">
+		<link rel="icon" href="/static/images/favicon.ico" type="image/x-icon">
+
+
+		<link rel="stylesheet" href="/static/assets/style.css">
+
+		
+		<script>
+		 new WOW().init();
+		</script>
+		<!---- animated-css ---->
+		<!---- start-smoth-scrolling---->
+		<script type="text/javascript" src="/static/js/move-top.js"></script>
+		<script type="text/javascript" src="/static/js/easing.js"></script>
+		<script src="http://echarts.baidu.com/build/dist/echarts.js"></script>
+		<script type="text/javascript">
+			jQuery(document).ready(function($) {
+				$(".scroll").click(function(event){		
+					event.preventDefault();
+					$('html,body').animate({scrollTop:$(this.hash).offset().top},1000);
+				});
+			});
+			function f(id){
+					 // 路径配置
+				require.config({
+					paths: {
+						echarts: 'http://echarts.baidu.com/build/dist'
+					}
+				});
+
+				// 使用
+				require(
+					[
+						'echarts',
+						'echarts/chart/bar' // 使用柱状图就加载bar模块，按需加载
+					],
+					function (ec) {
+						// 基于准备好的dom，初始化echarts图表
+						
+						var myChart = document.getElementById(id);
+						myChart.style.marginLeft="-30px";
+						myChart.style.marginTop="-30px";
+						var img1 = document.getElementById('img1');
+						//自适应宽高
+						var myChartContainer = function () {
+							console.log()
+							myChart.style.width = (window.innerWidth/2.8)+20+'px';
+							myChart.style.height = (window.innerWidth/3)*0.5+40+'px';
+						};
+						
+						myChartContainer();
+						var myChart = ec.init(myChart);
+                        var nums=[];    //数量数组（实际用来盛放Y坐标值）
+                        $.ajax({
+                         type : "get",
+                //       async : true,            //异步请求（同步请求将会锁住浏览器，用户其他操作必须等待请求完成才可以执行）
+                         url : "/echarts/"+id,    //请求发送到Servlet处
+                //       data : {},
+                         dataType : "json",        //返回数据形式为json
+                         success : function(result) {
+                             //请求成功时执行该函数内容，result即为服务器返回的json对象
+                             if (result) {
+                                    for(var i=0;i<result["data"].length;i++){
+
+                                        nums.push(result["data"][i]["num"]);    //挨个取出数量并填入销量数组
+                                      }
+                                      var option = {
+                                            tooltip: {
+                                                show: true
+                                            },
+                                            legend: {
+                                                data:[]
+                                            },
+                                            xAxis : [
+                                                {
+                                                    type : 'category',
+                                                    data : ["0","1","2","3","4","5","6","7","8","9"]
+                                                }
+                                            ],
+                                            yAxis : [
+                                                {
+                                                    type : 'value'
+                                                }
+                                            ],
+                                            series : [
+                                                {
+                                                    "name":"人数比例",
+                                                    "type":"bar",
+                                                    "data":nums,
+                                                    itemStyle:{
+                                                        normal:{
+                                                            color:'#4ad2ff'
+                                                        }
+                                                    },
+                                                }
+
+                                            ]
+                                        };
+                                        						// 为echarts对象加载数据
+                                    myChart.setOption(option);
+                                    myChartContainer();
+                                    myChart.resize();
+                             }
+
+                        },
+                         error : function(errorMsg) {
+                             //请求失败时执行该函数
+                         alert("图表请求数据失败!");
+                         myChart.hideLoading();
+                         }
+                    })
+
+					}
+				);
+			}
+			// 匿名方法
+            window.onload=function (){
+                f('caption1');
+                f('caption2');
+                f('caption3');
+                f('caption4');
+                f('caption5');
+                f('caption6');
+                f('caption7');
+                f('caption8');
+                f('caption9');
+            };
+		</script>
+		 <!---- start-smoth-scrolling---->
+		<!----start-top-nav-script---->
+		<script>
+			$(function() {
+				var pull 		= $('#pull');
+					menu 		= $('nav ul');
+					menuHeight	= menu.height();
+				$(pull).on('click', function(e) {
+					e.preventDefault();
+					menu.slideToggle();
+				});
+				$(window).resize(function(){
+	        		var w = $(window).width();
+	        		if(w > 320 && menu.is(':hidden')) {
+	        			menu.removeAttr('style');
+	        		}
+	    		});
+			});
+		</script>
+		<!----//End-top-nav-script---->
+	</head>
+	<body>		
+			<!-- Home section
+			================================================== -->
+			<section id="home" class="parallax-section">
+				<div class="container">
+					<div class="row">
+
+						<div class="col-md-12 col-sm-12">
+							<div class="col-md-12 col-sm-12">
+								<h3 class="wow fadeInDown" data-wow-delay="0.2s" id="deecamp" >DeeCamp2018</h3>
+								<h1 class="wow fadeInDown" id="title">图像美学评价</h1>
+							</div>
+						</div>
+					</div>
+				</div>		
+			</section>
+
+
+		<!-- Navigation section
+		================================================== -->
+		<section class="navbar navbar-default navbar-fixed-top sticky-navigation" role="navigation">
+			<div class="container">
+
+				<div class="navbar-header">
+					<button class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+						<span class="icon icon-bar"></span>
+						<span class="icon icon-bar"></span>
+						<span class="icon icon-bar"></span>
+					</button>
+					<a href="#" class="navbar-brand">DOYEN</a>
+				</div>
+				<div class="collapse navbar-collapse">
+					<ul class="nav navbar-nav navbar-right main-navigation">
+						<li><a href="#home" class="smoothScroll">HOME</a></li>
+						<li><a href="#about" class="smoothScroll">WORKS</a></li>
+						<li><a href="#testimonial" class="smoothScroll">PARTNER</a></li>
+						<li><a href="https://github.com/OrdinaryParanoia/Aesthetic-Assessment" target="_blank" class="smoothScroll">ABOUT</a></li>
+						<li><a href="#contactus" class="smoothScroll">CONTACT</a></li>
+					</ul>
+				</div>
+
+			</div>
+		</section>
+
+
+		
+	<section id="about" class="paralla-section">
+        	<div id="blockstyle">
+	        </div>
+			<div class="portfolio-box">				
+					<!---- start-portfolio-script----->
+					<script type="text/javascript" src="/static/js/jquery.mixitup.min.js"></script>
+					<script type="text/javascript">
+						$(function () {
+							var filterList = {
+								init: function () {
+								
+									// MixItUp plugin
+									// http://mixitup.io
+									$('#portfoliolist').mixitup({
+										targetSelector: '.portfolio',
+										filterSelector: '.filter',
+										effects: ['fade'],
+										easing: 'snap',
+										// call the hover effect
+										onMixEnd: filterList.hoverEffect()
+									});				
+								
+								},
+								hoverEffect: function () {
+									// Simple parallax effect
+									$('#portfoliolist .portfolio').hover(
+										function () {
+											$(this).find('.label').stop().animate({bottom: 0}, 200, 'easeOutQuad');
+											$(this).find('img').stop().animate({top: -30}, 500, 'easeOutQuad');				
+										},
+										function () {
+											$(this).find('.label').stop().animate({bottom: -40}, 200, 'easeInQuad');
+											$(this).find('img').stop().animate({top: 0}, 300, 'easeOutQuad');								
+										}		
+									);				
+								
+								}
+					
+							};
+							// Run the show!
+							filterList.init();
+						});	
+					</script>
+					<div id="portfoliolist">
+					<div class="portfolio logo1 mix_all port-big-grid wow bounceIn" data-wow-delay="0.5s" data-cat="logo" style="display: inline-block; opacity: 1;">
+						<div class="portfolio-wrapper">		
+							<a data-toggle="modal" data-target=".bs-example-modal-md"  class="b-link-stripe b-animate-go  thickbox">
+						     <img class="p-img" src="/static/images/portpic1.jpg" id="img1"/><div class="b-wrapper">
+						     	<h2 class="b-animate b-from-left    b-delay03 "  id="h2style1">
+						     		<div id="caption1" style="height:100px; width:300px;text-align:center;">
+										<h4 onclick="f('caption1')">点击查看分布</h4>
+						     		</div>
+						     	</h2>
+						  	</div></a>
+		                </div>
+					</div>				
+					<div class="portfolio app mix_all wow bounceIn" data-wow-delay="0.5s" data-cat="app" style="display: inline-block; opacity: 1;">
+						<div class="portfolio-wrapper">		
+							<a data-toggle="modal" data-target=".bs-example-modal-md"  class="b-link-stripe b-animate-go  thickbox">
+						     <img class="p-img" src="/static/images/portpic2.jpg" /><div class="b-wrapper">
+						     	<h2 class="b-animate b-from-left    b-delay03 "  id="h2style2">
+						     		<div id="caption2" style="height:100px; width:300px;text-align:center;">
+						     			<h4 onclick="f('caption2')">点击查看分布</h4>
+						     		</div>
+						     	</h2>
+						  	</div></a>
+		                </div>
+					</div>		
+					<div class="portfolio web mix_all wow bounceIn" data-wow-delay="0.5s" data-cat="web" style="display: inline-block; opacity: 1;">
+						<div class="portfolio-wrapper">		
+							<a data-toggle="modal" data-target=".bs-example-modal-md" class="b-link-stripe b-animate-go  thickbox">
+						     <img class="p-img" src="/static/images/portpic3.jpg" /><div class="b-wrapper">
+						     	<h2 class="b-animate b-from-left    b-delay03 "  id="h2style3">
+						     		<div id="caption3" style="height:100px; width:300px;text-align:center;">
+						     			<h4 onclick="f('caption3')">点击查看分布</h4>
+						     		</div>
+						     	</h2>
+						  	</div></a>
+		                </div>
+					</div>				
+					<div class="portfolio icon mix_all wow bounceIn" data-wow-delay="0.5s" data-cat="icon" style="display: inline-block; opacity: 1;">
+						<div class="portfolio-wrapper">		
+							<a data-toggle="modal" data-target=".bs-example-modal-md"  class="b-link-stripe b-animate-go  thickbox">
+						     <img class="p-img" src="/static/images/portpic4.jpg" /><div class="b-wrapper">
+						     	<h2 class="b-animate b-from-left    b-delay03 "  id="h2style4">
+						     		<div id="caption4" style="height:100px; width:300px;text-align:center;">
+						     			<h4 onclick="f('caption4')">点击查看分布</h4>
+						     		</div>
+						     	</h2>
+						  	</div></a>
+		                </div>
+					</div>	
+					<div class="portfolio app mix_all wow bounceIn" data-wow-delay="0.5s" data-cat="app" style="display: inline-block; opacity: 1;">
+						<div class="portfolio-wrapper">		
+							<a data-toggle="modal" data-target=".bs-example-modal-md"  class="b-link-stripe b-animate-go  thickbox">
+						     <img class="p-img" src="/static/images/portpic5.jpg" /><div class="b-wrapper">
+						     	<h2 class="b-animate b-from-left    b-delay03 " id="h2style5">
+						     		<div id="caption5" style="height:100px; width:300px;text-align:center;">
+						     			<h4 onclick="f('caption5')">点击查看分布</h4>
+						     		</div>
+						     	</h2>
+						  	</div></a>
+		                </div>
+					</div>			
+					<div class="portfolio card mix_all wow bounceIn" data-wow-delay="0.5s" data-cat="card" style="display: inline-block; opacity: 1;">
+						<div class="portfolio-wrapper">		
+							<a data-toggle="modal" data-target=".bs-example-modal-md"  class="b-link-stripe b-animate-go  thickbox">
+						     <img class="p-img" src="/static/images/portpic6.jpg" /><div class="b-wrapper">
+						     	<h2 class="b-animate b-from-left    b-delay03 " id="h2style6">
+						     		<div id="caption6" style="height:100px; width:300px;text-align:center;">
+						     			<h4 onclick="f('caption6')">点击查看分布</h4>
+						     		</div>
+						     	</h2>
+						  	</div></a>
+		                </div>
+					</div>	
+					<div class="portfolio icon mix_all wow bounceIn" data-wow-delay="0.5s" data-cat="icon" style="display: inline-block; opacity: 1;">
+						<div class="portfolio-wrapper">		
+							<a data-toggle="modal" data-target=".bs-example-modal-md"  class="b-link-stripe b-animate-go  thickbox">
+						     <img class="p-img" src="/static/images/portpic7.jpg" /><div class="b-wrapper">
+						     	<h2 class="b-animate b-from-left    b-delay03 " id="h2style7">
+						     		<div id="caption7" style="height:100px; width:300px;text-align:center;">
+						     			<h4 onclick="f('caption7')">点击查看分布</h4>
+						     		</div>
+						     	</h2>
+						  	</div></a>
+		                </div>
+					</div>	
+					<div class="portfolio app mix_all wow bounceIn" data-wow-delay="0.5s" data-cat="app" style="display: inline-block; opacity: 1;">
+						<div class="portfolio-wrapper">
+							<a data-toggle="modal" data-target=".bs-example-modal-md"  class="b-link-stripe b-animate-go  thickbox">
+						     <img class="p-img" src="/static/images/portpic8.jpg" /><div class="b-wrapper">
+						     	<h2 class="b-animate b-from-left    b-delay03 " id="h2style8">
+						     		<div id="caption8" style="height:100px; width:300px;text-align:center;">
+						     			<h4 onclick="f('caption8')">点击查看分布</h4>
+						     		</div>
+						     	</h2>
+						  	</div></a>
+		                </div>
+					</div>			
+					<div class="portfolio card mix_all wow bounceIn" data-wow-delay="0.5s" data-cat="card" style="display: inline-block; opacity: 1;">
+						<div class="portfolio-wrapper">		
+							<a data-toggle="modal" data-target=".bs-example-modal-md"  class="b-link-stripe b-animate-go  thickbox">
+						     <img class="p-img" src="/static/images/portpic9.jpg" /><div class="b-wrapper">
+						     	<h2 class="b-animate b-from-left    b-delay03 " id="h2style9">
+						     		<div id="caption9" style="height:100px; width:300px;text-align:center;">
+						     			<h4 onclick="f('caption9')">点击查看分布</h4>
+						     		</div>
+						     	</h2>
+						  	</div></a>
+		                </div>
+					</div>
+				   <div class="clearfix"> </div>		
+				</div>
+			</div>
+	</section>
+			
+			
+	<section id="testimonial" class="parallax-section">
+	<div class="container">
+		<div class="row">
+
+			<!-- Service Owl Carousel section
+			================================================== -->
+			<div id="owl-testimonial" class="owl-carousel">
+
+                <div class="item">
+					<div class="row">
+						<div class="col-md-offset-2 col-md-8">
+							<img src="/static/images/team/partner0.jpg" class="img-responsive img-circle" alt="testimonial img">
+							<h2>产业导师大佬</h2>
+							<p>有才又有颜的导师</p>
+						</div>
+					</div>
+				</div>
+				<div class="item">
+					<div class="row">
+						<div class="col-md-offset-2 col-md-8">
+							<img src="/static/images/team/partner1.jpg" class="img-responsive img-circle" alt="testimonial img">
+							<h2>李汤睿</h2>
+							<p>要去哈佛的组长大佬</p>
+						</div>
+					</div>
+				</div>
+				<div class="item">
+					<div class="row">
+						<div class="col-md-offset-2 col-md-8">
+							<img src="/static/images/team/partner2.jpg" class="img-responsive img-circle" alt="testimonial img">
+							<h2>沈国晔</h2>
+							<p>有公司的大佬</p>
+						</div>
+					</div>
+				</div>
+				<div class="item">
+					<div class="row">
+						<div class="col-md-offset-2 col-md-8">
+							<img src="/static/images/team/partner3.jpg" class="img-responsive img-circle" alt="testimonial img">
+							<h2>朱吉人</h2>
+							<p>数学系大佬</p>
+						</div>
+					</div>
+				</div>
+				<div class="item">
+					<div class="row">
+						<div class="col-md-offset-2 col-md-8">
+							<img src="/static/images/team/partner4.jpg" class="img-responsive img-circle" alt="testimonial img">
+							<h2>董海林</h2>
+							<p>我们厉害的海爷</p>
+						</div>
+					</div>
+				</div>
+				<div class="item">
+					<div class="row">
+						<div class="col-md-offset-2 col-md-8">
+							<img src="/static/images/team/partner5.jpg" class="img-responsive img-circle" alt="testimonial img">
+							<h2>熊诗颖</h2>
+							<p>博士大佬</p>
+						</div>
+					</div>
+				</div>
+				<div class="item">
+					<div class="row">
+						<div class="col-md-offset-2 col-md-8">
+							<img src="/static/images/team/partner6.jpg" class="img-responsive img-circle" alt="testimonial img">
+							<h2>周金晶</h2>
+							<p>我们金大佬</p>
+						</div>
+					</div>
+				</div>
+				<div class="item">
+					<div class="row">
+						<div class="col-md-offset-2 col-md-8">
+							<img src="/static/images/team/partner7.jpg" class="img-responsive img-circle" alt="testimonial img">
+							<h2>陈昕</h2>
+							<p>清华大佬</p>
+						</div>
+					</div>
+				</div>
+				<div class="item">
+					<div class="row">
+						<div class="col-md-offset-2 col-md-8">
+							<img src="/static/images/team/partner8.jpg" class="img-responsive img-circle" alt="testimonial img">
+							<h2>万珊红</h2>
+							<p>数据处理行家</p>
+						</div>
+					</div>
+				</div>
+				<div class="item">
+					<div class="row">
+						<div class="col-md-offset-2 col-md-8">
+							<img src="/static/images/team/partner9.jpg" class="img-responsive img-circle" alt="testimonial img">
+							<h2>徐春蕾</h2>
+							<p>厉害的第一名</p>
+						</div>
+					</div>
+				</div>
+				<div class="item">
+					<div class="row">
+						<div class="col-md-offset-2 col-md-8">
+							<img src="/static/images/team/partner10.jpg" class="img-responsive img-circle" alt="testimonial img">
+							<h2>李雪菲</h2>
+							<p>这是一个菜鸡</p>
+						</div>
+					</div>
+				</div>
+				<div class="item">
+					<div class="row">
+						<div class="col-md-offset-2 col-md-8">
+							<img src="/static/images/team/partner11.jpg" class="img-responsive img-circle" alt="testimonial img">
+							<h2>杨秋实</h2>
+							<p>优秀的大三学子</p>
+						</div>
+					</div>
+				</div>
+				<div class="item">
+					<div class="row">
+						<div class="col-md-offset-2 col-md-8">
+							<img src="/static/images/team/partner12.jpg" class="img-responsive img-circle" alt="testimonial img">
+							<h2>邹东霖</h2>
+							<p>看论文小能手</p>
+						</div>
+					</div>
+				</div>
+				<div class="item">
+					<div class="row">
+						<div class="col-md-offset-2 col-md-8">
+							<img src="/static/images/team/partner13.jpg" class="img-responsive img-circle" alt="testimonial img">
+							<h2>鲁泰之</h2>
+							<p>审美很棒的树莓小哥哥</p>
+						</div>
+					</div>
+				</div>
+			</div>
+				
+			</div>
+
+
+		</div>
+	</div>
+</section>
+			<!---- map ---->
+            <div class="clearfix"> </div>
+                <!---- footer --->
+            <section id="contactus">
+                <div class="footer text-center" id="footstyle">
+                </div>
+            </section>
+
+		
+<!-- Javascript 
+================================================== -->
+<script src="/static/js/bootstrap.min.js"></script>
+<script src="/static/js/jquery.nav.js"></script>
+<script src="/static/js/jquery.parallax.js"></script>
+<script src="/static/js/owl.carousel.min.js"></script>
+<script src="/static/js/isotope.min.js"></script>
+<script src="/static/js/wow.min.js"></script>
+<script src="/static/js/counter.js"></script>
+<script src="/static/js/custom.js"></script>
+
+
+</body>
+</html>

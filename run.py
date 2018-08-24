@@ -18,6 +18,7 @@ import torchvision.models as models
 
 # import lrs
 import tensorboardX
+from torch.nn import MSELoss
 
 from data_loader import AVADataset
 
@@ -116,11 +117,12 @@ def main(config):
         init_val_loss = float('inf')
         train_losses = []
         val_losses = []
-        emd_loss = EMDLoss()
+        emd_loss_func = EMDLoss()
+        mse_loss_func = MSELoss()
         for epoch in range(config.warm_start_epoch, config.epochs):
             model.train()
             # lrs.send('epoch', epoch)
-            batch_losses = []
+            batch_emb_losses = []
             for i, data in enumerate(train_loader):
                 images = data['image'].to(device)
                 labels = data['annotations'].to(device).float()
@@ -130,21 +132,30 @@ def main(config):
 
                 optimizer.zero_grad()
 
-                loss = emd_loss(labels, outputs)
-                batch_losses.append(loss.item())
+                emd_loss_value = emd_loss_func(labels, outputs)
+                dist = torch.arange(10).float().to(device)
+                var_loss_value = mse_loss_func(labels.var(dim=1), outputs.var(dim=1))
+                p_mean = (outputs.view(-1, 10) * dist).sum(dim=1)
+                l_mean = (labels.view(-1, 10) * dist).sum(dim=1)
+                mean_loss_value = mse_loss_func(p_mean, l_mean)
+
+                loss = emd_loss_value + var_loss_value + mean_loss_value
+
+                batch_emb_losses.append(emd_loss_value.item())
 
                 loss.backward()
                 # import ipdb; ipdb.set_trace()
                 optimizer.step()
 
                 # lrs.send('train_emd_loss', loss.item())
-                writer.add_scalar('train/emd_loss', loss, step)
+                writer.add_scalar('train/emd_loss', emd_loss_value, step)
                 writer.add_scalar('train/accuracy', compute_acc(labels, outputs), step)
 
                 print('Epoch: %d/%d | Step: %d/%d | Training EMD loss: %.4f' % (
-                    epoch + 1, config.epochs, i + 1, len(trainset) // config.train_batch_size + 1, loss.data[0]))
+                    epoch + 1, config.epochs, i + 1, len(trainset) // config.train_batch_size + 1,
+                    emd_loss_value.data[0]))
 
-            avg_loss = sum(batch_losses) / (len(trainset) // config.train_batch_size + 1)
+            avg_loss = sum(batch_emb_losses) / (len(trainset) // config.train_batch_size + 1)
             train_losses.append(avg_loss)
             writer.add_scalar('train/avg_loss', avg_loss, step)
             print('Epoch %d averaged training EMD loss: %.4f' % (epoch + 1, avg_loss))
@@ -181,7 +192,7 @@ def main(config):
                     outputs = model(images)
                 step += 1
                 outputs = outputs.view(-1, 10, 1)
-                val_loss = emd_loss(labels, outputs)
+                val_loss = emd_loss_func(labels, outputs)
                 batch_val_losses.append(val_loss.item())
                 val_acc.append(compute_acc(labels, outputs))
             avg_val_loss = sum(batch_val_losses) / (len(valset) // config.val_batch_size + 1)
